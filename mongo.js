@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const password = require("./password.js");
 
-const connectionString = `mongodb+srv://zylown:${password}@cluster0.wrim82n.mongodb.net/midudb?retryWrites=true&w=majority`;
+const connectionString = process.env.MONGO_DB_URI;
 
 //conexion a mongodb
 mongoose
@@ -12,7 +12,3 @@ mongoose
   .catch((error) => {
     console.log(error);
   });
-
-
-
-

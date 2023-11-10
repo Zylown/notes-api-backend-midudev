@@ -1,3 +1,4 @@
+require("dotenv").config(); //ver si tenemos este archivo .env y leerlo
 const Note = require("./models/Note");
 
 // const http = require("http");

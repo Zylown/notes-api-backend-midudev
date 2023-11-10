@@ -7,19 +7,17 @@ const noteSchema = new mongoose.Schema({
   important: Boolean,
 });
 
+noteSchema.set("toJSON", {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id;
+    delete returnedObject._id; //elimina el id de mongo
+    delete returnedObject.__v; //elimina el __v de mongo
+  },
+});
+
 const Note = mongoose.model("Note", noteSchema); //modelo de mongoose
 
 module.exports = Note;
-
-
-
-
-
-
-
-
-
-
 
 // Note.find({}).then((result) => {
 //   //el ({}) significa que no hay filtros al buscar datos
