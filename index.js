@@ -1,34 +1,18 @@
+const Note = require("./models/Note");
+
 // const http = require("http");
 const express = require("express");
 const cors = require("cors"); // Importa el módulo cors
 const crypto = require("crypto"); // Importa el módulo crypto
 const app = express();
 const logger = require("./loggerMiddleware");
+require("./mongo.js");
 
 app.use(express.json()); //Middleware que permite a express parsear el body de la request a JSON
 app.use(cors()); // Middleware que permite a express usar CORS
 app.use(logger);
 
-let notes = [
-  {
-    id: 1,
-    content: "HTML is easy",
-    date: "2019-05-30T17:30:31.098Z",
-    important: true,
-  },
-  {
-    id: 2,
-    content: "Browser can execute only JavaScript",
-    date: "2019-05-30T18:39:34.091Z",
-    important: false,
-  },
-  {
-    id: 3,
-    content: "GET and POST are the most important methods of HTTP protocol",
-    date: "2019-05-30T19:20:14.298Z",
-    important: true,
-  },
-];
+let notes = [];
 
 // const app = http.createServer((request, response) => {
 //   response.writeHead(200, { "Content-Type": "application/JSON" });
@@ -40,7 +24,9 @@ app.get("/", (request, response) => {
 });
 
 app.get("/api/notes", (request, response) => {
-  response.json(notes);
+  Note.find({}).then((notes) => {
+    response.json(notes);
+  });
 });
 
 app.get("/api/notes/:id", (request, response) => {
