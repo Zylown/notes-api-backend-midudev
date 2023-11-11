@@ -31,15 +31,29 @@ app.get("/api/notes", (request, response) => {
 });
 
 app.get("/api/notes/:id", (request, response) => {
-  const id = Number(request.params.id);
-  const note = notes.find((note) => note.id === id);
+  const { id } = request.params.id;
+  // const note = notes.find((note) => note.id === id);
+
+  Note.findById(id)
+    .then((note) => {
+      if (note) {
+        return response.json(note);
+      } else {
+        response.status(404).end();
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      response.status(400).end(); //error de servicio no disponible
+    });
+
   console.log({ id });
   // response.send(id);
-  if (note) {
-    response.json(note);
-  } else {
-    response.status(404).end();
-  }
+  // if (note) {
+  //   response.json(note);
+  // } else {
+  //   response.status(404).end();
+  // }
 });
 
 app.delete("/api/notes/:id", (request, response) => {
@@ -58,19 +72,19 @@ app.post("/api/notes", (request, response) => {
     });
   }
 
-  const id = crypto.randomUUID();
-  /*const ids = notes.map((note) => note.id)
-	const maxId = Math.max(...ids)*/
-
-  console.log({ note });
-  const newNote = {
-    id: id,
+  const newNote = new Note({
     content: note.content,
     important: typeof note.important !== "undefined" ? note.important : false,
     date: new Date().toISOString(),
-  };
-  notes = [...notes, newNote];
-  response.status(201).json(newNote);
+  });
+  note.save().then((savedNote) => {
+    response.json(savedNote);
+    response.status(201).json(newNote);
+  });
+  const id = crypto.randomUUID();
+  /*const ids = notes.map((note) => note.id)
+	const maxId = Math.max(...ids)*/
+  console.log({ note });
 });
 
 app.use((request, response) => {
