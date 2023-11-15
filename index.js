@@ -45,17 +45,20 @@ app.get("/", (request, response) => {
   response.send("<h1>Hello World!</h1>");
 });
 
-app.get("/api/notes", (request, response) => {
-  Note.find({}).then((notes) => {
-    response.json(notes);
-  });
+app.get("/api/notes", async (request, response) => {
+  // await Note.find({}).then((notes) => {
+  //   response.json(notes);
+  // });
+  //es lo mismo que lo de arriba
+  const notes = await Note.find({});
+  response.json(notes);
 });
 
-app.get("/api/notes/:id", (request, response, next) => {
+app.get("/api/notes/:id", async (request, response, next) => {
   const id = request.params.id;
   // const note = notes.find((note) => note.id === id);
 
-  Note.findById(id)
+  await Note.findById(id)
     .then((note) => {
       // si tiene la nota devuelve la nota(200)
       return note ? response.json(note) : response.status(404).end();
@@ -80,19 +83,20 @@ app.put("/api/notes/:id", (request, response, next) => {
   });
 });
 
-app.delete("/api/notes/:id", (request, response, next) => {
+app.delete("/api/notes/:id", async (request, response, next) => {
   /*const id = Number(request.params.id);
   notes = notes.filter((note) => note.id !== id); //se guardaran todas las notas menos la que estamos borrando
   console.log({ id });
   response.status(204).end();*/
 
   const { id } = request.params;
-  Note.findByIdAndDelete(id)
-    .then(() => response.status(204).end())
-    .catch((error) => next(error)); //si tienes un error va al siguiente middleware
+  await Note.findByIdAndDelete(id);
+  response.status(204).end();
+  // .then(() => response.status(204).end())
+  // .catch((error) => next(error)); //si tienes un error va al siguiente middleware
 });
 
-app.post("/api/notes", (request, response) => {
+app.post("/api/notes", async (request, response) => {
   const note = request.body;
 
   if (!note || !note.content) {
@@ -107,10 +111,17 @@ app.post("/api/notes", (request, response) => {
     date: new Date().toISOString(),
   });
 
-  newNote
-    .save()
-    .then((savedNote) => response.status(201).json(savedNote)) // Solo envía la nota guardada, no newNote
-    .catch((error) => next(error));
+  // newNote
+  //   .save()
+  //   .then((savedNote) => response.status(201).json(savedNote)) // Solo envía la nota guardada, no newNote
+  //   .catch((error) => next(error));
+
+  try {
+    const savedNote = newNote.save();
+    response.status(201).json(savedNote);
+  } catch (error) {
+    next(error);
+  }
 
   // const id = crypto.randomUUID();
   /*const ids = notes.map((note) => note.id)
