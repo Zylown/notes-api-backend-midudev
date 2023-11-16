@@ -12,7 +12,7 @@ const userSchema = new Schema({
   ],
 });
 
-noteSchema.set("toJSON", {
+userSchema.set("toJSON", {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id;
     delete returnedObject._id; //elimina el id de mongo
