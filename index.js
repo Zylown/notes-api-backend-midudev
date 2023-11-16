@@ -90,7 +90,8 @@ app.delete("/api/notes/:id", async (request, response, next) => {
   response.status(204).end();*/
 
   const { id } = request.params;
-  await Note.findByIdAndDelete(id);
+  const res = await Note.findByIdAndDelete(id);
+  if (res === null) return response.sendStatus(404);
   response.status(204).end();
   // .then(() => response.status(204).end())
   // .catch((error) => next(error)); //si tienes un error va al siguiente middleware
