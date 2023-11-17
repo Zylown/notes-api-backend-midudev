@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon index.js",
     "start": "cross-env NODE_ENV=production node index.js",
-    "test": "cross-env NODE_ENV=test jest --verbose --silent __tests__/notes.test.js",
+    "test": "cross-env NODE_ENV=test PORT=1234 jest --verbose --silent __tests__/user.test.js",
     "test:watch": "pnpm run test --watch"
   },
   "keywords": [],
@@ -25,7 +25,8 @@
     "cross-env": "^7.0.3",
     "dotenv": "^16.3.1",
     "express": "4.18.2",
-    "mongoose": "8.0.0"
+    "mongoose": "8.0.0",
+    "mongoose-unique-validator": "^4.0.0"
   },
   "jest": {
     "testEnvironment": "node",

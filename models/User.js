@@ -1,7 +1,14 @@
+const uniqueValidator = require("mongoose-unique-validator");
 const { Schema, model } = require("mongoose");
 
 const userSchema = new Schema({
-  username: String,
+  username: {
+    type: String,
+    unique: true, //asegura que no haya dos usuarios con el mismo nombre
+    minlength: 3, //longitud minima de 3 caracteres
+    required: true, //campo requerido
+  },
+  // username: String,
   name: String,
   passwordHash: String,
   notes: [
@@ -21,6 +28,8 @@ userSchema.set("toJSON", {
     delete returnedObject.passwordHash; //elimina el passwordHash de mongo
   },
 });
+
+userSchema.plugin(uniqueValidator); //aplica el plugin uniqueValidator al esquema
 
 const User = model("User", userSchema); //modelo llamado User y el esquema userSchema
 

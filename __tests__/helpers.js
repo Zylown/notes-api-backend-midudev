@@ -1,6 +1,6 @@
 const { app } = require("../index"); // Link to your server file
 const supertest = require("supertest");
-
+const  User  = require("../models/User"); // Link to your Note mongoose model
 const api = supertest(app);
 
 const initialNotes = [
@@ -29,4 +29,14 @@ const getAllContentFromNotes = async () => {
   };
 };
 
-module.exports = { getAllContentFromNotes, api, initialNotes };
+const getAllUsersFromDB = async () => {
+  const usersDB = await User.find({}); //busca todos los usuarios en la base de datos
+  return usersDB.map((user) => user.toJSON()); //convierte los usuarios en objetos JSON
+};
+
+module.exports = {
+  getAllContentFromNotes,
+  api,
+  initialNotes,
+  getAllUsersFromDB,
+};
