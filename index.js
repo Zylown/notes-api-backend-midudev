@@ -12,6 +12,7 @@ const notFound = require("./middleware/notFound.js");
 const handleErrors = require("./middleware/handleErrors.js");
 require("./mongo.js");
 const usersRouter = require("./controllers/users");
+const User = require("./models/User.js");
 
 app.use(express.json()); //Middleware que permite a express parsear el body de la request a JSON
 app.use(cors()); // Middleware que permite a express usar CORS
@@ -51,7 +52,7 @@ app.get("/api/notes", async (request, response) => {
   //   response.json(notes);
   // });
   //es lo mismo que lo de arriba
-  const notes = await Note.find({});
+  const notes = await Note.find({}).populate("user", { username: 1, name: 1 });
   response.json(notes);
 });
 
@@ -99,18 +100,21 @@ app.delete("/api/notes/:id", async (request, response, next) => {
 });
 
 app.post("/api/notes", async (request, response) => {
-  const note = request.body;
+  const { content, important = false, userId } = request.body;
 
-  if (!note || !note.content) {
+  const user = await User.findById(userId);
+
+  if (!content) {
     return response.status(400).json({
       error: "note.content is missing",
     });
   }
 
   const newNote = new Note({
-    content: note.content,
-    important: typeof note.important !== "undefined" ? note.important : false,
-    date: new Date().toISOString(),
+    content,
+    date: new Date(),
+    important,
+    user: user._id,
   });
 
   // newNote
@@ -119,8 +123,12 @@ app.post("/api/notes", async (request, response) => {
   //   .catch((error) => next(error));
 
   try {
-    const savedNote = newNote.save();
-    response.status(201).json(savedNote);
+    const savedNote = await newNote.save();
+    //concatena el id de la nota guardada con el array de notas del usuario
+    user.notes = user.notes.concat(savedNote._id);
+    await user.save(); //guarda el usuario con el id de la nota
+    response.json(savedNote);
+    // response.status(201).json(savedNote);
   } catch (error) {
     next(error);
   }
@@ -128,7 +136,7 @@ app.post("/api/notes", async (request, response) => {
   // const id = crypto.randomUUID();
   /*const ids = notes.map((note) => note.id)
 	const maxId = Math.max(...ids)*/
-  console.log({ note });
+  console.log({ newNote });
 });
 
 // app.use((request, response) => {

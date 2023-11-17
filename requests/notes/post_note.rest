@@ -2,7 +2,8 @@ POST http://localhost:3001/api/notes
 Content-Type: application/json
 
 {
-    "content": "Probando ando",
-    "important": true
+    "content": "Suscríbete a @midudev",
+    "important": true,
+    "userId": "6557b5f7a530de95b2e9e650"
 }
   

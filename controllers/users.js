@@ -2,7 +2,12 @@ const bcrypt = require("bcrypt");
 const userRouter = require("express").Router(); //el router de express es para crear rutas
 const User = require("../models/User");
 
-userRouter.post("/", async (request, response, next) => {
+userRouter.get("/", async (request, response) => {
+  const users = await User.find({}).populate("notes", { content: 1, date: 1 });
+  response.json(users); //el metodo json convierte el objeto en json
+});
+
+userRouter.post("/", async (request, response) => {
   try {
     const { body } = request;
     const { username, name, password } = body;
