@@ -11,8 +11,9 @@ const logger = require("./loggerMiddleware");
 const notFound = require("./middleware/notFound.js");
 const handleErrors = require("./middleware/handleErrors.js");
 require("./mongo.js");
-const usersRouter = require("./controllers/users");
 const User = require("./models/User.js");
+const usersRouter = require("./controllers/users");
+const loginRouter = require("./controllers/login");
 
 app.use(express.json()); //Middleware que permite a express parsear el body de la request a JSON
 app.use(cors()); // Middleware que permite a express usar CORS
@@ -149,6 +150,7 @@ app.post("/api/notes", async (request, response) => {
 // The error handler must be registered before any other error middleware and after all controllers
 
 app.use("/api/users", usersRouter);
+app.use("/api/login", loginRouter);
 
 app.use(notFound);
 
