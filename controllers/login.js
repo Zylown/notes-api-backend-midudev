@@ -11,14 +11,24 @@ loginRouter.post("/", async (req, res) => {
   const passwordCorrect =
     user === null ? false : await bcrypt.compare(password, user.passwordHash);
   // compara la contraseña que se envia con la que esta en la base de datos
-  if (!passwordCorrect) {
+  if (!(user && passwordCorrect)) {
+    // si no existe el usuario o la contraseña es incorrecta
     return res.status(401).json({
       error: "invalid user or password",
     });
   }
+
+  const userForToken = {
+    id: user._id,
+    username: user.username,
+  };
+
+  const token = jwt.sign(userForToken, process.env.SECRET); // se crea el token
+
   res.send({
     name: user.name,
     username: user.username,
+    token,
   });
 });
 
