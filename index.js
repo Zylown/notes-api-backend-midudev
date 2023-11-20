@@ -14,6 +14,8 @@ require("./mongo.js");
 const User = require("./models/User.js");
 const usersRouter = require("./controllers/users");
 const loginRouter = require("./controllers/login");
+// const jwt = require("jsonwebtoken");
+const userExtractor = require("./middleware/userExtractor.js");
 
 app.use(express.json()); //Middleware que permite a express parsear el body de la request a JSON
 app.use(cors()); // Middleware que permite a express usar CORS
@@ -53,6 +55,7 @@ app.get("/api/notes", async (request, response) => {
   //   response.json(notes);
   // });
   //es lo mismo que lo de arriba
+  // populate rellena el campo user con el objeto del usuario
   const notes = await Note.find({}).populate("user", { username: 1, name: 1 });
   response.json(notes);
 });
@@ -72,7 +75,7 @@ app.get("/api/notes/:id", async (request, response, next) => {
   // response.status(400).end(); //error de servicio no disponible
 });
 
-app.put("/api/notes/:id", (request, response, next) => {
+app.put("/api/notes/:id", userExtractor, (request, response, next) => {
   const { id } = request.params;
   const note = request.body;
 
@@ -86,7 +89,7 @@ app.put("/api/notes/:id", (request, response, next) => {
   });
 });
 
-app.delete("/api/notes/:id", async (request, response, next) => {
+app.delete("/api/notes/:id", userExtractor, async (request, response, next) => {
   /*const id = Number(request.params.id);
   notes = notes.filter((note) => note.id !== id); //se guardaran todas las notas menos la que estamos borrando
   console.log({ id });
@@ -100,8 +103,12 @@ app.delete("/api/notes/:id", async (request, response, next) => {
   // .catch((error) => next(error)); //si tienes un error va al siguiente middleware
 });
 
-app.post("/api/notes", async (request, response) => {
-  const { content, important = false, userId } = request.body;
+app.post("/api/notes", userExtractor, async (request, response) => {
+  //esto es enviarselo por el cuerpo de la request
+  const { content, important = false } = request.body;
+
+  //sacar userId de request
+  const { userId } = request;
 
   const user = await User.findById(userId);
 
